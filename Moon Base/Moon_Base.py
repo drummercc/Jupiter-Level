@@ -7,6 +7,7 @@ def ball_animation():
     screen.fill(bg_color)
     screen.blit(background_game, (0,0))
     screen.blit(target, (screen_width * i/48, screen_height * 36/40))
+    screen.blit(astronaut, (screen_width * 4/6, screen_height / 60 *39))
     target_rect = pygame.Rect(screen_width * i/48, screen_height * 69/72, target.get_width(), 2)
     pygame.draw.ellipse(screen, (0,200,200), ball)
     pygame.draw.rect(screen, (0,0,0), line)
@@ -16,8 +17,8 @@ def ball_animation():
     text1 = font.render("Velocity " + "{:.2f}".format(ball_velocity), 30, (200,0,0))
     textlives = font.render("Lives Left: " + str(lives), 30, (200,0,0))
     screen.blit(textlives, (screen_width * 6/8, screen_height * 1/12))
-    screen.blit(text1, (screen_width/6, screen_height/8))
-    screen.blit(text, (screen_width/6, screen_height/12))
+    screen.blit(text1, (screen_width/12, screen_height/8))
+    screen.blit(text, (screen_width/12, screen_height/12))
     ball.x += ball_speed_x
     ball.y += ball_speed_y
 
@@ -77,8 +78,9 @@ def completed():
     screen.blit(launcher, (screen_width / 120 * 27 - int(launcher.get_width() / 4), screen_height / 120 * 95 - int(launcher.get_height() /2)))
     screen.blit(background, (0,0))
     screen.blit(launcher, (screen_width / 120 * 27 - int(launcher.get_width() / 4), screen_height / 120 * 95 - int(launcher.get_height() /2)))
+    screen.blit(astronaut, (screen_width * 4/6, screen_height / 60 *39))
     screen.blit(target, (screen_width * i/48, screen_height * 36/40))
-    screen.blit(text_launcher, (screen_width *2 / 6, screen_height/8))
+    screen.blit(text_launcher, (screen_width *2 / 6, screen_height/12))
     screen.blit(player_walking [walkcount//7], (player_x, player_y))
     screen.blit(door_frame, (screen_width * 46 / 100, screen_height * 66 / 100))
     player_x += 1.5
@@ -89,29 +91,54 @@ def completed():
     
 
 def player_animation():
-    global walkcount, player_x, i, font, text_launcher, walking
+    global walkcount, player_x, i, font, text_launcher, walking, j
     screen.blit(background, (0,0))
     screen.blit(launcher, (screen_width / 120 * 27 - int(launcher.get_width() / 4), screen_height / 120 * 95 - int(launcher.get_height() /2)))
+    screen.blit(astronaut, (screen_width * 4/6, screen_height / 60 *39))
     screen.blit(target, (screen_width * i/48, screen_height * 36/40))
-    screen.blit(text_launcher, (screen_width *2 / 6, screen_height/8))
+    screen.blit(text_launcher, (screen_width *2 / 6, screen_height/12))
     if walkcount + 1 >= 27:
         walkcount = 0
     if walking:
         screen.blit(player_walking [walkcount//7], (player_x, player_y))
         walkcount += 1
+    if player_x < 0:
+        player_x = 0
     if walking == False:
         screen.blit(player_standing, (player_x, player_y))
     if player_x > screen_width / 100 * 41:
         player_x = screen_width / 100 * 41
+        if j == 1:
+            screen.blit(speech_1, (screen_width * 3/8, screen_height * 3/8))
+            pygame.display.flip()
+            sound1.play()
+            pygame.time.delay(14000)
+            screen.blit(speech_2, (screen_width * 3/8, screen_height * 3/8))
+            pygame.display.flip()
+            pygame.time.delay(14000)
+            j = 0
         text_launcher = font.render("Press Enter At Launcher", 40, (200,0,0))
-    if player_x < screen_width / 100 * 25 and player_x > screen_width / 100:
-        if event.type == pygame.KEYDOWN:
+    if j == 0:
+        if player_x < screen_width / 100 * 25 and player_x > screen_width / 100:
+            border = pygame.Rect(screen_width / 100 * 15, screen_height / 100 * 66, 215, 26)
+            pygame.draw.rect(screen, (0,0,0), border)
+            text_enter = font.render("[Press Enter Here]",  30, (255,255,255))
+            screen.blit(text_enter, (screen_width / 100 * 15, screen_height / 100 * 66))
+            if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_RETURN:
                     intro = False
                     playing = True
         
     pygame.display.update()
 
+def fill():
+    global player_x
+    screen.blit(background, (0,0))
+    screen.blit(launcher, (screen_width / 120 * 27 - int(launcher.get_width() / 4), screen_height / 120 * 95 - int(launcher.get_height() /2)))
+    screen.blit(target, (screen_width * i/48, screen_height * 36/40))
+    screen.blit(astronaut, (screen_width * 4/6, screen_height / 60 *39))
+    screen.blit(text_launcher, (screen_width *2 / 6, screen_height/12))
+    screen.blit(player_standing, (player_x, player_y))
 
 
 # General Set up
@@ -125,6 +152,7 @@ screen_height = 600
 screen = pygame.display.set_mode((screen_width,screen_height))
 pygame.display.set_caption('projectile')
 i = 35
+j = 1
 
 #Graphics
 target = pygame.image.load('Target(1).png')
@@ -150,6 +178,12 @@ launcher = pygame.image.load('Projectile-Launcher.png')
 background = pygame.image.load('JupiterChallengeRoom.png')
 background_game = pygame.image.load('JupiterChallengeRoom(Game Scene).png')
 door_frame = pygame.image.load('DoorFrame.png')
+astronaut = pygame.image.load('astronaut_instructor.png')
+
+speech_1 = pygame.image.load("JupiterIntroText(11).png")
+speech_2 = pygame.image.load("JupiterIntroText(12).png")
+
+sound1 = pygame.mixer.Sound('Part_5.wav')
 
 player_walking = [pygame.image.load('charv2(1).png'), pygame.image.load('charv2(2).png'), pygame.image.load('charv2(3).png'), pygame.image.load('charv2(4).png')]
 player_standing = pygame.image.load('charv2(5).png')
@@ -226,7 +260,7 @@ while True:
                 ball_speed_x = ball_velocity * math.cos(ball_angle * math.pi/180)
                 ball_speed_y = ball_velocity * math.sin(ball_angle * math.pi/180)
             else:
-                j = 5
+                k = 5
                     
     if event.type == pygame.KEYUP:
         if event.key == pygame.K_DOWN:
